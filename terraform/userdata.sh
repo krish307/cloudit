@@ -1,20 +1,34 @@
 #!/bin/bash
 
-sudo apt update -y
+set -euxo pipefail
 
-sudo apt install docker.io -y
+exec > >(tee /var/log/cloudit-userdata.log | logger -t cloudit-userdata -s 2>/dev/console) 2>&1
 
-sudo systemctl enable docker
+export DEBIAN_FRONTEND=noninteractive
 
-sudo systemctl start docker
-#!/bin/bash
-
-apt update -y
-
-apt install docker.io -y
+apt-get update -y
+apt-get install -y docker.io git curl
 
 systemctl enable docker
-
 systemctl start docker
 
 usermod -aG docker ubuntu
+
+rm -rf /opt/cloudit
+
+git clone "${repository_url}" /opt/cloudit
+
+cd /opt/cloudit
+
+docker build -t cloudit:latest .
+
+docker rm -f cloudit-web || true
+
+docker run \
+  --detach \
+  --restart unless-stopped \
+  --name cloudit-web \
+  --publish 80:80 \
+  cloudit:latest
+
+docker ps

@@ -4,8 +4,26 @@
 .vscode/
 .terraform/
 
-*.tfstate
-
-*.tfstate.*
 
 .terraform.lock.hcl
+# Terraform working files
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+
+# Local environment values
+terraform/terraform.tfvars
+
+# Credentials and secrets
+*.pem
+.env
+.env.*
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
