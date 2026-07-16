@@ -3,7 +3,7 @@ variable "aws_region" {
 }
 
 variable "instance_type" {
-  default = "t2.micro"
+  default = "t3.micro"
 }
 
 variable "instance_name" {
@@ -12,10 +12,5 @@ variable "instance_name" {
 
 variable "key_name" {
   description = "AWS Key Pair Name"
-  type        = string
-}
-
-variable "ami_id" {
-  description = "Ubuntu AMI"
   type        = string
 }
