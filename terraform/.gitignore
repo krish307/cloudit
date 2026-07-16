@@ -1,0 +1,11 @@
+*.log
+.env
+.terraform/
+.vscode/
+.terraform/
+
+*.tfstate
+
+*.tfstate.*
+
+.terraform.lock.hcl

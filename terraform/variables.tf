@@ -1,17 +1,21 @@
 variable "aws_region" {
-  description = "AWS Region where resources will be created"
-  type        = string
-  default     = "ap-south-1"
+  default = "ap-south-1"
 }
 
 variable "instance_type" {
-  description = "EC2 Instance Type"
-  type        = string
-  default     = "t3.micro"
+  default = "t2.micro"
 }
 
 variable "instance_name" {
-  description = "Name of the EC2 Instance"
+  default = "CloudIt-Server"
+}
+
+variable "key_name" {
+  description = "AWS Key Pair Name"
   type        = string
-  default     = "CloudIt-Server"
+}
+
+variable "ami_id" {
+  description = "Ubuntu AMI"
+  type        = string
 }
