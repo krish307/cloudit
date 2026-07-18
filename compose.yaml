@@ -1,0 +1,29 @@
+name: cloudit
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    image: cloudit:latest
+    container_name: cloudit-web
+
+    ports:
+      - "80:80"
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://127.0.0.1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+    networks:
+      - cloudit-network
+
+networks:
+  cloudit-network:
+    driver: bridge

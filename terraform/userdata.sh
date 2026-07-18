@@ -20,15 +20,8 @@ git clone "${repository_url}" /opt/cloudit
 
 cd /opt/cloudit
 
-docker build -t cloudit:latest .
+apt-get install -y docker-compose-plugin
 
-docker rm -f cloudit-web || true
+docker compose up --build --detach
 
-docker run \
-  --detach \
-  --restart unless-stopped \
-  --name cloudit-web \
-  --publish 80:80 \
-  cloudit:latest
-
-docker ps
+docker compose ps

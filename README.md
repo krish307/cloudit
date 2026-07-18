@@ -130,6 +130,7 @@ The workflow includes:
 - [Terraform Deployment Guide](docs/terraform-deployment.md)
 - [Terraform Configuration](terraform/README.md)
 - [Deployment Evidence](docs/screenshots/)
+- [Docker Compose Deployment](docs/docker-compose.md)
 
 
 ---
@@ -156,17 +157,17 @@ CloudIt/
 
 ---
 
-# Roadmap
+## Current Progress
 
 - ✅ Dockerized Website
 - ✅ Terraform Infrastructure
-- 🔜 Docker Compose
-- GitHub Actions CI/CD
-- Custom VPC
-- Remote State
-- Kubernetes
-- Monitoring
-- Production Hardening
+- ✅ Docker Compose
+- ⏳ GitHub Actions CI/CD
+- ⏳ Custom VPC
+- ⏳ Terraform Remote State
+- ⏳ Kubernetes
+- ⏳ Monitoring
+- ⏳ Production Hardening
 
 ---
 
