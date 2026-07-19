@@ -1,0 +1,45 @@
+name: CloudIt Docker CI
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  docker-validation:
+    name: Build and Test CloudIt
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Verify Docker Compose File
+        run: docker compose config
+
+      - name: Build Docker Image
+        run: docker compose build
+
+      - name: Start Containers
+        run: docker compose up -d
+
+      - name: Wait for Container
+        run: sleep 10
+
+      - name: Verify Running Containers
+        run: docker compose ps
+
+      - name: Test Website
+        run: curl --fail http://localhost
+
+      - name: Show Logs if Failed
+        if: failure()
+        run: docker compose logs
+
+      - name: Shutdown Containers
+        if: always()
+        run: docker compose down
