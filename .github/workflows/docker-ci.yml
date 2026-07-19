@@ -1,4 +1,4 @@
-name: CloudIt Docker CI
+name: CloudIt CI/CD
 
 on:
   push:
@@ -11,35 +11,97 @@ on:
 
 jobs:
   docker-validation:
-    name: Build and Test CloudIt
+    name: Docker CI Validation
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Verify Docker Compose File
+      - name: Validate Docker Compose
         run: docker compose config
 
-      - name: Build Docker Image
+      - name: Build Docker image
         run: docker compose build
 
-      - name: Start Containers
+      - name: Start application
         run: docker compose up -d
 
-      - name: Wait for Container
+      - name: Wait for application
         run: sleep 10
 
-      - name: Verify Running Containers
+      - name: Show container status
         run: docker compose ps
 
-      - name: Test Website
+      - name: Test application
         run: curl --fail http://localhost
 
-      - name: Show Logs if Failed
+      - name: Show logs on failure
         if: failure()
         run: docker compose logs
 
-      - name: Shutdown Containers
+      - name: Clean up CI environment
         if: always()
         run: docker compose down
+
+  deploy:
+    name: Deploy to AWS EC2
+    runs-on: ubuntu-latest
+    needs: docker-validation
+
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Configure SSH
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$EC2_SSH_KEY" > ~/.ssh/ec2_key
+          chmod 600 ~/.ssh/ec2_key
+          ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
+
+      - name: Deploy CloudIt to EC2
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+        run: |
+          ssh -i ~/.ssh/ec2_key "$EC2_USER@$EC2_HOST" << 'EOF'
+            set -e
+
+            cd /home/ubuntu/cloudit
+
+            echo "Fetching latest CloudIt code..."
+            git fetch origin
+            git reset --hard origin/main
+
+            echo "Building and deploying CloudIt..."
+            docker compose \
+              -f compose.yaml \
+              -f compose.ec2.yaml \
+              up --build -d --remove-orphans
+
+            echo "Checking container status..."
+            docker compose \
+              -f compose.yaml \
+              -f compose.ec2.yaml \
+              ps
+
+            echo "Testing CloudIt inside EC2..."
+            curl --fail \
+              --retry 10 \
+              --retry-delay 3 \
+              http://localhost:8081
+
+            echo "CloudIt deployment completed successfully."
+          EOF
+
+      - name: Verify public deployment
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          curl --fail \
+            --retry 10 \
+            --retry-delay 3 \
+            "http://$EC2_HOST:8081"
