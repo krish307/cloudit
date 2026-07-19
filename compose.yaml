@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
 
     healthcheck:
-      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://127.0.0.1 || exit 1"]
+      test: ["CMD-SHELL", "nginx -t && kill -0 1"]
       interval: 30s
       timeout: 5s
       retries: 3
