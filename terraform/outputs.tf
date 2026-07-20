@@ -32,3 +32,17 @@ output "ssh_command" {
   description = "Example SSH connection command"
   value       = "ssh -i cloud-web-key.pem ubuntu@${aws_instance.cloudit_server.public_ip}"
 }
+output "ecr_repository_name" {
+  description = "Name of the CloudIt ECR repository"
+  value       = aws_ecr_repository.cloudit.name
+}
+
+output "ecr_repository_url" {
+  description = "URL used to push and pull CloudIt Docker images"
+  value       = aws_ecr_repository.cloudit.repository_url
+}
+
+output "ecr_repository_arn" {
+  description = "ARN of the CloudIt ECR repository"
+  value       = aws_ecr_repository.cloudit.arn
+}
