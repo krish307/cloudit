@@ -14,8 +14,8 @@
 crash.log
 crash.*.log
 
-# Local environment values
-terraform/terraform.tfvars
+# Local environment value
+terraform.tfvars
 
 # Credentials and secrets
 *.pem
