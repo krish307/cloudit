@@ -111,7 +111,7 @@ jobs:
           chmod 600 ~/.ssh/ec2_key
           ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
 
-      - name: Deploy CloudIt to EC2
+         - name: Deploy CloudIt to EC2
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USER: ${{ secrets.EC2_USER }}
@@ -125,12 +125,41 @@ jobs:
             git fetch origin
             git reset --hard origin/main
 
-            echo "Building and deploying CloudIt..."
+            echo "Logging in to Amazon ECR..."
+            aws ecr get-login-password --region ap-southeast-2 \
+              | docker login \
+                  --username AWS \
+                  --password-stdin \
+                  832569408670.dkr.ecr.ap-southeast-2.amazonaws.com
+
+            export ECR_IMAGE="832569408670.dkr.ecr.ap-southeast-2.amazonaws.com/cloudit-app:latest"
+
+            echo "Pulling latest image from Amazon ECR..."
             docker compose \
               -f compose.yaml \
               -f compose.ec2.yaml \
-              up --build -d --remove-orphans
+              pull
 
+            echo "Deploying CloudIt from Amazon ECR..."
+            docker compose \
+              -f compose.yaml \
+              -f compose.ec2.yaml \
+              up -d --remove-orphans
+
+            echo "Checking container status..."
+            docker compose \
+              -f compose.yaml \
+              -f compose.ec2.yaml \
+              ps
+
+            echo "Testing CloudIt inside EC2..."
+            curl --fail \
+              --retry 10 \
+              --retry-delay 3 \
+              http://localhost:8081
+
+            echo "CloudIt deployment completed successfully."
+          EOF
             echo "Checking container status..."
             docker compose \
               -f compose.yaml \
