@@ -90,10 +90,7 @@ vpc_security_group_ids = [
 
   associate_public_ip_address = true
 
-  vpc_security_group_ids = [
-    aws_security_group.cloudit_sg.id
-  ]
-
+  
  user_data = templatefile("${path.module}/userdata.sh", {
   repository_url = var.repository_url
 })
