@@ -1,4 +1,8 @@
 services:
   web:
+    build: !reset null
+
+    image: ${ECR_IMAGE}
+
     ports: !override
       - "8081:80"
