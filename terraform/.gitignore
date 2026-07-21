@@ -1,20 +1,18 @@
-*.log
-.env
+# Terraform working directory
 .terraform/
-.vscode/
-.terraform/
-
-
-.terraform.lock.hcl
-# Terraform working files
 **/.terraform/*
+
+# Terraform state and plan files
 *.tfstate
 *.tfstate.*
 *.tfplan
+
+# Crash logs
 crash.log
 crash.*.log
+*.log
 
-# Local environment value
+# Local environment values
 terraform.tfvars
 
 # Credentials and secrets
@@ -27,3 +25,4 @@ terraform.tfvars
 .idea/
 .DS_Store
 Thumbs.db
+.terraform.lock.hcl
