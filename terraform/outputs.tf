@@ -51,3 +51,10 @@ output "github_actions_ecr_role_arn" {
   description = "IAM role assumed by GitHub Actions through OIDC"
   value       = aws_iam_role.github_actions_ecr.arn
 }
+output "terraform_state_bucket" {
+  value = aws_s3_bucket.terraform_state.bucket
+}
+
+output "terraform_lock_table" {
+  value = aws_dynamodb_table.terraform_lock.name
+}
