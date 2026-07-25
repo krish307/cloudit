@@ -26,3 +26,5 @@ terraform.tfvars
 .DS_Store
 Thumbs.db
 .terraform.lock.hcl
+# Kubernetes secrets containing local credentials
+kubernetes/secret.yaml

@@ -1,1 +1,17 @@
 body{font-family:Arial;text-align:center;margin:40px}
+.runtime-config {
+  margin: 2rem auto;
+  padding: 1.25rem;
+  max-width: 700px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.runtime-config h2 {
+  margin-bottom: 0.75rem;
+}
+
+.runtime-config p {
+  margin: 0.35rem 0;
+}

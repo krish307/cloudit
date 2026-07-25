@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudit-config
+  namespace: cloudit
+
+data:
+  APP_NAME: "CloudIt"
+  APP_VERSION: "v3"
+  ENVIRONMENT: "staging"
+  COMPANY: "Krish Singh"

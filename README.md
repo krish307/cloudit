@@ -24,6 +24,10 @@ The project currently combines:
 - Amazon Elastic Container Registry (ECR)
 - GitHub Actions CI/CD
 - Deployment validation and container health checks
+- Kubernetes deployment with Minikube and kubectl
+- ConfigMaps and Secrets for runtime configuration
+- Startup, Readiness, and Liveness probes
+- Rolling updates, rollback, scaling, and self-healing
 
 CloudIt is being developed phase by phase, with each milestone extending the same project rather than creating isolated demonstrations.
 
@@ -49,6 +53,20 @@ CloudIt is being developed phase by phase, with each milestone extending the sam
 - ✅ Remote Terraform state in Amazon S3
 - ✅ Terraform state locking with DynamoDB
 - ✅ Public HTTP access to the deployed application
+- ✅ Kubernetes namespace isolation
+- ✅ Kubernetes Deployment with two replicas
+- ✅ ReplicaSet-based rollout management
+- ✅ NodePort Service
+- ✅ ConfigMap runtime configuration
+- ✅ Kubernetes Secrets
+- ✅ CPU and Memory Requests & Limits
+- ✅ Startup Probe
+- ✅ Readiness Probe
+- ✅ Liveness Probe
+- ✅ Rolling Updates
+- ✅ Rollback
+- ✅ Self-healing Pods
+- ✅ Kubernetes Dashboard validation
 
 ---
 
@@ -65,6 +83,7 @@ CloudIt is being developed phase by phase, with each milestone extending the sam
 | Web Server | Nginx |
 | Shell and Administration | Bash, SSH, Linux |
 | Version Control | Git, GitHub |
+| Orchestration | Kubernetes, Minikube, kubectl |
 
 ---
 
@@ -74,29 +93,65 @@ CloudIt is being developed phase by phase, with each milestone extending the sam
 flowchart TD
     A[Developer] -->|Push to main| B[GitHub Repository]
 
+    %% Source Control & CI/CD
     B --> C[GitHub Actions]
     C --> C1[Validate Docker Compose]
-    C --> C2[Build and test container]
+    C --> C2[Build and Test Docker Image]
     C --> C3[Authenticate to AWS with OIDC]
     C3 --> D[Amazon ECR]
 
+    %% Infrastructure Provisioning
     E[Terraform] --> F[Amazon S3 Remote State]
     E --> G[DynamoDB State Lock]
     E --> H[Custom AWS VPC]
 
     H --> I[Public Subnet]
-    I --> J[Internet Gateway and Route Table]
-    I --> K[EC2 Instance]
+    I --> J[Internet Gateway]
+    J --> K[EC2 Instance]
     K --> L[Security Group]
 
+    %% EC2 Bootstrap
     K --> M[EC2 User Data]
     M --> N[Install Docker and Docker Compose]
     N --> O[Clone CloudIt Repository]
-    O --> P[Build and Start Container]
-    P --> Q[CloudIt Nginx Application]
-    Q -->|HTTP Port 80| R[Public Website]
+    O --> P[Build and Run Docker Container]
 
-    C -->|SSH-based deployment workflow| K
+    %% Application
+    P --> Q[CloudIt Application]
+    Q -->|HTTP :80| R[Public Website]
+
+    %% GitHub Deployment
+    C -->|SSH Deployment| K
+
+    %% Kubernetes
+    P -. Container Image .-> S[Minikube Kubernetes Cluster]
+
+    subgraph Kubernetes_Cluster
+        T[Namespace: cloudit]
+        U[Deployment]
+        V[ReplicaSet]
+        W[CloudIt Pod 1]
+        X[CloudIt Pod 2]
+        Y[NodePort Service]
+        Z[ConfigMap]
+        AA[Secret]
+
+        T --> U
+        U --> V
+        V --> W
+        V --> X
+
+        Y --> W
+        Y --> X
+
+        Z --> W
+        Z --> X
+
+        AA --> W
+        AA --> X
+    end
+
+    S --> T
 ```
 
 > Amazon ECR is configured as the project's private container registry. The current EC2 bootstrap process builds the application from the repository during instance creation; using ECR as the runtime image source is a future deployment improvement.
@@ -156,7 +211,16 @@ CloudIt/
 ├── compose.yaml
 ├── compose.ec2.yaml
 └── README.md
-```
+├── kubernetes/
+│   ├── namespace.yaml
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   ├── configmap.yaml
+│   └── secret.example.yaml
+
+docs/
+└── screenshots/
+    └── kubernetes/
 
 > Local variable files, Terraform state files, private keys, and other sensitive files must not be committed to the repository.
 
@@ -230,6 +294,24 @@ CloudIt/
 - Verified `cloud-init` completion
 - Verified a healthy container on port 80
 - Verified the application locally and through its public URL
+
+### ✅ Phase 9 — Kubernetes Foundations
+
+- Created the dedicated `cloudit` namespace
+- Deployed CloudIt using a Kubernetes Deployment
+- Added ReplicaSets
+- Exposed the application using a NodePort Service
+- Configured two running replicas
+- Verified manual scaling
+- Verified automatic Pod self-healing
+- Added CPU and Memory Requests & Limits
+- Configured Startup, Readiness and Liveness Probes
+- Implemented ConfigMap runtime configuration
+- Injected Secrets using Kubernetes Secrets
+- Tested Rolling Updates
+- Verified Rollback
+- Validated resources using the Kubernetes Dashboard
+- Verified a healthy deployment with two running Pods
 
 ---
 
@@ -379,6 +461,41 @@ Planned production hardening includes:
 - Improved secrets management
 
 ---
+## ☸️ Kubernetes Foundations
+
+CloudIt now runs on Kubernetes using Minikube and production-inspired deployment practices.
+
+### Kubernetes Components
+
+- Namespace
+- Deployment
+- ReplicaSets
+- NodePort Service
+- ConfigMaps
+- Secrets
+- Resource Requests & Limits
+- Startup Probe
+- Readiness Probe
+- Liveness Probe
+- Rolling Updates
+- Rollback
+- Manual Scaling
+- Self-healing Pods
+
+### Kubernetes Architecture
+
+```mermaid
+flowchart TD
+    A[Browser] --> B[NodePort Service]
+    B --> C[CloudIt Pod 1]
+    B --> D[CloudIt Pod 2]
+
+    E[ConfigMap] --> C
+    E --> D
+
+    F[Kubernetes Secret] --> C
+    F --> D
+```
 
 ## 📸 Deployment Evidence
 
@@ -436,6 +553,17 @@ Terraform successfully provisioned the custom VPC, public subnet, Internet Gatew
 
 CloudIt is running successfully on the provisioned EC2 instance inside the custom VPC, demonstrating a fully automated Infrastructure as Code deployment with Terraform and Docker.
 
+### Kubernetes Foundations
+
+![Deployment Dashboard](docs/screenshots/kubernetes/deployment_dashboard.png)
+
+Healthy Deployment with two replicas running.
+
+---
+
+![Pod Details](docs/screenshots/kubernetes/pod_details_dashboard.png)
+
+Pod status showing the running CloudIt container with ConfigMap and Secret injection.
 
 
 ---
@@ -517,23 +645,38 @@ Replacing the EC2 instance changed its public IP. This demonstrated why producti
 - SSH
 - Package and service management
 
+### Containers and Orchestration
+
+- Docker
+- Docker Compose
+- Kubernetes
+- Minikube
+- kubectl
+- ConfigMaps
+- Secrets
+- Rolling Updates
+- Rollback
+- Health Probes
+
 ---
 
-## 🔜 Roadmap
+## Roadmap
 
-- Kubernetes deployment
-- Amazon EKS
-- Monitoring and observability
-- Prometheus
-- Grafana
-- Amazon CloudWatch
-- Production hardening
-- Application Load Balancer
-- HTTPS and DNS
-- Nginx Ingress
-- Horizontal scaling
-- Database integration
-
+| Phase | Status | Topic |
+|---|:---:|---|
+| Phase 1 | ✅ Completed | Infrastructure as Code |
+| Phase 2 | ✅ Completed | Containerization |
+| Phase 3 | ✅ Completed | Source Control & CI |
+| Phase 4 | ✅ Completed | Amazon ECR |
+| Phase 5 | ✅ Completed | Production Networking |
+| Phase 6 | ✅ Completed | Kubernetes Foundations |
+| Phase 7 | ⏳ Pending | Database & Persistent Storage |
+| Phase 8 | ⏳ Pending | Monitoring & Observability |
+| Phase 9 | ⏳ Pending | Self-Healing Engineering |
+| Phase 10 | ⏳ Pending | Production Reliability |
+| Phase 11 | ⏳ Pending | Chaos Engineering |
+| Phase 12 | ⏳ Pending | AWS Production Deployment |
+| Phase 13 | ⏳ Pending | Documentation & Portfolio Launch |
 ---
 
 ## 🌐 Live Demo
@@ -583,6 +726,6 @@ If you found this project useful, consider giving the repository a star.
 
 **Provision • Containerize • Automate • Deploy**
 
-**Built with AWS, Terraform, Docker, Docker Compose, GitHub Actions, Ubuntu Linux, and Nginx.**
+Built with AWS, Terraform, Docker, Docker Compose, GitHub Actions, Kubernetes, Minikube, Ubuntu Linux, and Nginx.
 
 </p>
