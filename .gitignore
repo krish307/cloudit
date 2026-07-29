@@ -28,3 +28,4 @@ Thumbs.db
 .terraform.lock.hcl
 # Kubernetes secrets containing local credentials
 kubernetes/secret.yaml
+kubernetes/postgres-secret.yaml
