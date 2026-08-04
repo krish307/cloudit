@@ -29,3 +29,4 @@ Thumbs.db
 # Kubernetes secrets containing local credentials
 kubernetes/secret.yaml
 kubernetes/postgres-secret.yaml
+.env.fullstack

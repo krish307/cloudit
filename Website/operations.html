@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>CloudIt Operations Log</title>
+
+  <link rel="stylesheet" href="operations.css">
+</head>
+
+<body>
+  <main class="container">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">CloudIt Platform</p>
+        <h1>Operations Log</h1>
+        <p>
+          Record deployment events and operational updates in PostgreSQL.
+        </p>
+      </div>
+
+      <div id="health-status" class="health pending">
+        Checking API…
+      </div>
+    </header>
+
+    <section class="panel">
+      <h2>Create operation</h2>
+
+      <form id="operation-form">
+        <div class="form-grid">
+          <label>
+            Service name
+            <input
+              id="service-name"
+              name="service_name"
+              value="CloudIt"
+              maxlength="100"
+              required
+            >
+          </label>
+
+          <label>
+            Environment
+            <select id="environment" name="environment" required>
+              <option value="Local Development">Local Development</option>
+              <option value="Kubernetes">Kubernetes</option>
+              <option value="Production">Production</option>
+            </select>
+          </label>
+
+          <label>
+            Status
+            <select id="status" name="status" required>
+              <option value="Healthy">Healthy</option>
+              <option value="Deploying">Deploying</option>
+              <option value="Warning">Warning</option>
+              <option value="Failed">Failed</option>
+              <option value="Recovered">Recovered</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          Operational note
+          <textarea
+            id="note"
+            name="note"
+            maxlength="500"
+            placeholder="Describe the deployment, incident, recovery or platform update."
+            required
+          ></textarea>
+        </label>
+
+        <div class="form-actions">
+          <button id="submit-button" type="submit">
+            Save operation
+          </button>
+
+          <p id="form-message" aria-live="polite"></p>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading">
+        <h2>Saved operations</h2>
+
+        <button id="refresh-button" type="button" class="secondary">
+          Refresh
+        </button>
+      </div>
+
+      <div id="operations-list" class="operations-list">
+        <p>Loading operations…</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="operations.js"></script>
+</body>
+</html>

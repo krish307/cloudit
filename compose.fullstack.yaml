@@ -1,0 +1,93 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cloudit-postgres
+    restart: unless-stopped
+
+    env_file:
+      - .env.fullstack
+
+    volumes:
+      - cloudit-postgres-data:/var/lib/postgresql/data
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+    networks:
+      - cloudit-fullstack-network
+
+    mem_limit: 384m
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    image: cloudit-api:v1
+    container_name: cloudit-api
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    ports:
+      - "8000:8000"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen("http://localhost:8000/health", timeout=3)
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+    networks:
+      - cloudit-fullstack-network
+
+    mem_limit: 256m
+
+  frontend:
+    build:
+      context: ./Website
+      dockerfile: Dockerfile.fullstack
+
+    image: cloudit-frontend:v1
+    container_name: cloudit-frontend
+    restart: unless-stopped
+
+    ports:
+      - "8080:80"
+
+    depends_on:
+      api:
+        condition: service_healthy
+
+    networks:
+      - cloudit-fullstack-network
+
+    mem_limit: 128m
+
+networks:
+  cloudit-fullstack-network:
+    name: cloudit-fullstack-network
+
+volumes:
+  cloudit-postgres-data:
+    name: cloudit-postgres-data
