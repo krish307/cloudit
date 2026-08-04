@@ -16,7 +16,7 @@ spec:
       maxUnavailable: 0
       maxSurge: 1
 
-      
+
   selector:
     matchLabels:
       app: cloudit
@@ -28,7 +28,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
         - name: cloudit
-          image: cloudit:v3
+          image: cloudit-frontend:v2
           imagePullPolicy: Never
           envFrom:
           - configMapRef:
@@ -50,7 +50,7 @@ spec:
 
           startupProbe:
               httpGet:
-                path: /
+                path: /operations.html
                 port: 80
               periodSeconds: 5
               failureThreshold: 12
@@ -58,14 +58,14 @@ spec:
 
           readinessProbe:
             httpGet:
-              path: /
+              path: /operations.html
               port: 80
             initialDelaySeconds: 5
             periodSeconds: 5
           
           livenessProbe:
             httpGet:
-              path: /
+              path: /operations.html
               port: 80
             initialDelaySeconds: 15
             periodSeconds: 10
