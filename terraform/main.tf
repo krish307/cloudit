@@ -34,7 +34,7 @@ data "aws_ami" "ubuntu" {
 resource "aws_security_group" "cloudit_sg" {
   name_prefix = "cloudit-sg-"
   description = "Security group for the CloudIt web server"
-  vpc_id = aws_vpc.cloudit.id
+  vpc_id      = aws_vpc.cloudit.id
 
   ingress {
     description = "SSH administration"
@@ -81,19 +81,19 @@ resource "aws_security_group" "cloudit_sg" {
 resource "aws_instance" "cloudit_server" {
   subnet_id = aws_subnet.public.id
 
-vpc_security_group_ids = [
-  aws_security_group.cloudit_sg.id
-]
+  vpc_security_group_ids = [
+    aws_security_group.cloudit_sg.id
+  ]
   ami           = data.aws_ami.ubuntu.id
   instance_type = var.instance_type
   key_name      = var.key_name
 
   associate_public_ip_address = true
 
-  
- user_data = templatefile("${path.module}/userdata.sh", {
-  repository_url = var.repository_url
-})
+
+  user_data = templatefile("${path.module}/userdata.sh", {
+    repository_url = var.repository_url
+  })
   user_data_replace_on_change = true
 
   metadata_options {
